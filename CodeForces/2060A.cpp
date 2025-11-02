@@ -78,68 +78,32 @@ void preprocessing() {
 
 
 auto Solve(const int &n) -> void {
-    int m, k;
-    cin >> m >> k;
-    vector<vector<char> > grid(n, vector<char>(m));
+    vi a(5);
 
-    int cnt = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            cin >> grid[i][j];
-            if (grid[i][j] == '.') {
-                cnt++;
-            }
+    function<int()> calc = [&]() -> int {
+        int ret = 0;
+        for (int i = 2; i < 5; i++) {
+            if (a[i] == a[i - 1] + a[i - 2]) ret++;
         }
-    }
-
-    cnt = cnt - k;
-    vector<vector<int> > vis(n, vector<int>(m));
-    auto bfs = [&](int u, int v) -> void {
-        queue<pair<int, int> > q;
-        q.push({u, v});
-        vis[u][v] = true;
-        cnt--;
-        if (!cnt) return;
-        while (!q.empty()) {
-            auto [x, y] = q.front();
-            q.pop();
-
-            for (int d = 0; d < 4; ++d) {
-                int nx = x + dx[d];
-                int ny = y + dy[d];
-
-                if (nx >= 0 && nx < n && ny >= 0 && ny < m && !vis[nx][ny] && grid[nx][ny] == '.') {
-                    vis[nx][ny] = true;
-                    cnt--;
-                    if (!cnt) return;
-                    q.push({nx, ny});
-                }
-            }
-        }
+        return ret;
     };
 
-    bool flag = true;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            if (grid[i][j] == '.' and flag) {
-                bfs(i, j), flag = false;
-                // dbg(vis)
-            }
-            if (grid[i][j] == '.' and !vis[i][j]) {
-                cout << 'X';
-            } else if (grid[i][j] == '.') {
-                cout << '.';
-            } else cout << '#';
-        }
-        cout << endl;
-    }
+    cin >> a[0] >> a[1] >> a[3] >> a[4];
+    int ans = 0;
+    a[2] = a[0] + a[1];
+    ans = max(ans, calc());
+    a[2] = a[3] - a[1];
+    ans = max(ans, calc());
+    a[2] = a[4] - a[3];
+    ans = max(ans, calc());
+    cout << ans << endl;
 }
 
 bool solve_test(const int test_number) {
     int n = 1;
     // string n;
-    if (!(cin >> n))
-        return false;
+    // if (!(cin >> n))
+    //     return false;
     Solve(n);
     // auto ans = Solve(n);
     // cout << ans << endl;
@@ -158,7 +122,7 @@ int32_t main() {
     // freopen("document.out", "w", stdout);
     preprocessing();
     int test_cases = 1;
-    // cin >> test_cases;
+    cin >> test_cases;
     for (int tc = 1; tc <= test_cases; tc++) {
         // cout << "Case " << tc << ": " << endl;
         // cout << "Case #" << tc << ": ";

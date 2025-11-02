@@ -78,61 +78,37 @@ void preprocessing() {
 
 
 auto Solve(const int &n) -> void {
-    int m, k;
-    cin >> m >> k;
-    vector<vector<char> > grid(n, vector<char>(m));
-
-    int cnt = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            cin >> grid[i][j];
-            if (grid[i][j] == '.') {
-                cnt++;
-            }
-        }
-    }
-
-    cnt = cnt - k;
-    vector<vector<int> > vis(n, vector<int>(m));
-    auto bfs = [&](int u, int v) -> void {
-        queue<pair<int, int> > q;
-        q.push({u, v});
-        vis[u][v] = true;
-        cnt--;
-        if (!cnt) return;
-        while (!q.empty()) {
-            auto [x, y] = q.front();
-            q.pop();
-
-            for (int d = 0; d < 4; ++d) {
-                int nx = x + dx[d];
-                int ny = y + dy[d];
-
-                if (nx >= 0 && nx < n && ny >= 0 && ny < m && !vis[nx][ny] && grid[nx][ny] == '.') {
-                    vis[nx][ny] = true;
-                    cnt--;
-                    if (!cnt) return;
-                    q.push({nx, ny});
+    int m;
+    cin >> m;
+    vi val(n, -1);
+    vector<vector<int> > a(n, vector<int>(m));
+    bool flag = true;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            cin >> a[i][j];
+            if (val[i] == -1) {
+                val[i] = (a[i][j] % n);
+            } else {
+                if (val[i] != (a[i][j]) % n) {
+                    flag = false;
                 }
             }
         }
-    };
-
-    bool flag = true;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            if (grid[i][j] == '.' and flag) {
-                bfs(i, j), flag = false;
-                // dbg(vis)
-            }
-            if (grid[i][j] == '.' and !vis[i][j]) {
-                cout << 'X';
-            } else if (grid[i][j] == '.') {
-                cout << '.';
-            } else cout << '#';
-        }
-        cout << endl;
     }
+    if (!flag) {
+        cout << -1 << endl;
+        return;
+    }
+
+    vector<pair<int, int> > ord;
+    for (int i = 0; i < n; i++) {
+        ord.pb({val[i], i});
+    }
+    sort(all(ord));
+    for (int i = 0; i < n; i++) {
+        cout << ord[i].Y + 1 << " ";
+    }
+    cout << endl;
 }
 
 bool solve_test(const int test_number) {
@@ -158,7 +134,7 @@ int32_t main() {
     // freopen("document.out", "w", stdout);
     preprocessing();
     int test_cases = 1;
-    // cin >> test_cases;
+    cin >> test_cases;
     for (int tc = 1; tc <= test_cases; tc++) {
         // cout << "Case " << tc << ": " << endl;
         // cout << "Case #" << tc << ": ";

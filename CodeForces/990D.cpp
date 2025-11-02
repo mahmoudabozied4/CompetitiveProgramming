@@ -78,58 +78,33 @@ void preprocessing() {
 
 
 auto Solve(const int &n) -> void {
-    int m, k;
-    cin >> m >> k;
-    vector<vector<char> > grid(n, vector<char>(m));
-
-    int cnt = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            cin >> grid[i][j];
-            if (grid[i][j] == '.') {
-                cnt++;
-            }
-        }
+    int a, b;
+    cin >> a >> b;
+    if (n == 1 and n == a and a == b) {
+        cout << "YES"<<endl;
+        cout << 0 << endl;
+        return;
     }
 
-    cnt = cnt - k;
-    vector<vector<int> > vis(n, vector<int>(m));
-    auto bfs = [&](int u, int v) -> void {
-        queue<pair<int, int> > q;
-        q.push({u, v});
-        vis[u][v] = true;
-        cnt--;
-        if (!cnt) return;
-        while (!q.empty()) {
-            auto [x, y] = q.front();
-            q.pop();
+    if (a == 1 and b == 1 and n <= 3) {
+        cout << "NO";
+        return;
+    }
+    if (a > 1 and b > 1) {
+        cout << "NO";
+        return;
+    }
+    vector<vector<int> > grid(n, vector<int>(n));
 
-            for (int d = 0; d < 4; ++d) {
-                int nx = x + dx[d];
-                int ny = y + dy[d];
-
-                if (nx >= 0 && nx < n && ny >= 0 && ny < m && !vis[nx][ny] && grid[nx][ny] == '.') {
-                    vis[nx][ny] = true;
-                    cnt--;
-                    if (!cnt) return;
-                    q.push({nx, ny});
-                }
-            }
-        }
-    };
-
-    bool flag = true;
+    for (int i = 0; i < n - max(a, b); ++i) {
+        grid[i][i + 1] = grid[i + 1][i] = 1; // undir
+    }
+    cout << "YES" << endl;
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            if (grid[i][j] == '.' and flag) {
-                bfs(i, j), flag = false;
-                // dbg(vis)
-            }
-            if (grid[i][j] == '.' and !vis[i][j]) {
-                cout << 'X';
-            } else if (grid[i][j] == '.') {
-                cout << '.';
-            } else cout << '#';
+        for (int j = 0; j < n; ++j) {
+            if (i == j) cout << 0;
+            else if (a > b) cout << grid[i][j];
+            else cout << (grid[i][j] == 1 ? 0 : 1);
         }
         cout << endl;
     }

@@ -78,61 +78,25 @@ void preprocessing() {
 
 
 auto Solve(const int &n) -> void {
-    int m, k;
-    cin >> m >> k;
-    vector<vector<char> > grid(n, vector<char>(m));
-
-    int cnt = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            cin >> grid[i][j];
-            if (grid[i][j] == '.') {
-                cnt++;
-            }
+    int k;
+    cin >> k;
+    vi a(n);
+    cin >> a;
+    sort(all(a));
+    if (n == k) {
+        cout << a[n - 1] << endl;
+    } else if (k == 0) {
+        if (a[0] >= 2) {
+            cout << a[0] - 1 << endl;
+        } else {
+            cout << -1 << endl;
         }
+    } else if (a[k - 1] == a[k]) {
+        cout << -1 << endl;
+    } else {
+        cout << a[k - 1] << endl;
     }
 
-    cnt = cnt - k;
-    vector<vector<int> > vis(n, vector<int>(m));
-    auto bfs = [&](int u, int v) -> void {
-        queue<pair<int, int> > q;
-        q.push({u, v});
-        vis[u][v] = true;
-        cnt--;
-        if (!cnt) return;
-        while (!q.empty()) {
-            auto [x, y] = q.front();
-            q.pop();
-
-            for (int d = 0; d < 4; ++d) {
-                int nx = x + dx[d];
-                int ny = y + dy[d];
-
-                if (nx >= 0 && nx < n && ny >= 0 && ny < m && !vis[nx][ny] && grid[nx][ny] == '.') {
-                    vis[nx][ny] = true;
-                    cnt--;
-                    if (!cnt) return;
-                    q.push({nx, ny});
-                }
-            }
-        }
-    };
-
-    bool flag = true;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            if (grid[i][j] == '.' and flag) {
-                bfs(i, j), flag = false;
-                // dbg(vis)
-            }
-            if (grid[i][j] == '.' and !vis[i][j]) {
-                cout << 'X';
-            } else if (grid[i][j] == '.') {
-                cout << '.';
-            } else cout << '#';
-        }
-        cout << endl;
-    }
 }
 
 bool solve_test(const int test_number) {

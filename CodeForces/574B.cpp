@@ -78,61 +78,68 @@ void preprocessing() {
 
 
 auto Solve(const int &n) -> void {
-    int m, k;
-    cin >> m >> k;
-    vector<vector<char> > grid(n, vector<char>(m));
+    int m;
+    cin >> m;
+    vector<vector<int> > grid(n, vector<int>());
 
-    int cnt = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            cin >> grid[i][j];
-            if (grid[i][j] == '.') {
-                cnt++;
-            }
-        }
+    for (int j = 0; j < m; ++j) {
+        int u, v;
+        cin >> u >> v;
+        u--, v--;
+        grid[u].push_back(v);
+        grid[v].push_back(u);
     }
 
-    cnt = cnt - k;
-    vector<vector<int> > vis(n, vector<int>(m));
-    auto bfs = [&](int u, int v) -> void {
-        queue<pair<int, int> > q;
-        q.push({u, v});
-        vis[u][v] = true;
-        cnt--;
-        if (!cnt) return;
-        while (!q.empty()) {
-            auto [x, y] = q.front();
-            q.pop();
+    vi path;
+    vvi allCycles;
+    vi onPath(n);
+    function<void(int, int, int)> dfs = [&](int u, int p, int startNode) {
+        path.pb(u);
+        onPath[u] = true;
 
-            for (int d = 0; d < 4; ++d) {
-                int nx = x + dx[d];
-                int ny = y + dy[d];
+        if (path.size() > 3) {
+            path.pop_back();
+            onPath[u] = false;
+            return;
+        }
 
-                if (nx >= 0 && nx < n && ny >= 0 && ny < m && !vis[nx][ny] && grid[nx][ny] == '.') {
-                    vis[nx][ny] = true;
-                    cnt--;
-                    if (!cnt) return;
-                    q.push({nx, ny});
+        for (auto v: grid[u]) {
+            if (v == p) {
+                continue;
+            }
+
+            if (v == startNode) {
+                if (path.size() == 3) {
+                    allCycles.pb(path);
+                }
+            } else if (v > startNode && !onPath[v]) {
+                if (path.size() < 3) {
+                    dfs(v, u, startNode);
                 }
             }
         }
+        path.pop_back();
+        onPath[u] = false;
     };
 
-    bool flag = true;
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            if (grid[i][j] == '.' and flag) {
-                bfs(i, j), flag = false;
-                // dbg(vis)
-            }
-            if (grid[i][j] == '.' and !vis[i][j]) {
-                cout << 'X';
-            } else if (grid[i][j] == '.') {
-                cout << '.';
-            } else cout << '#';
-        }
-        cout << endl;
+        path.clear();
+        fill(all(onPath), false);
+        dfs(i, -1, i);
     }
+
+    int ans = OO;
+    for (auto cyc: allCycles) {
+        int ret = 0;
+        for (auto u: cyc) {
+            ret += sz(grid[u]) - 2;
+        }
+        ans = min(ret, ans);
+    }
+    if (ans == OO) {
+        cout << -1 << endl;
+    }else 
+    cout << ans << endl;
 }
 
 bool solve_test(const int test_number) {
