@@ -78,59 +78,26 @@ void preprocessing() {
 
 
 auto Solve(const int &n) -> void {
-    int a;
-    cin >> a;
-    vi v(n);
-    cin >> v;
-
-    vector<pii> events;
-
-    for (int i = 0; i < n; ++i) {
-        auto x = v[i], dist = x > a ? x - a : a - x;
-        if (dist == 0) continue;
-
-        auto l = x - dist + 1, r = x + dist - 1;
-
-        if (l < 0) l = 0;
-        if (r > OO) r = OO;
-
-        if (l > r) continue;
-        events.emplace_back(l, +1);
-        if (r < OO) {
-            events.emplace_back(r + 1, -1);
+    vi a(n + 1), pref(n + 1);
+    for (int i = 1; i <= n; i++) {
+        cin >> a[i];
+        pref[i] = pref[i - 1] + a[i];
+    }
+    int sum = pref[n], ans = 0;
+    int l = 0;
+    for (int r = 1; r <= n; r++) {
+        int e = r * (r + 1) - pref[r];
+        ans = max(ans, e + l);
+        if (r < n) {
+            int s = pref[r] - 1LL * (r + 1) * (r + 1) + (r + 1);
+            l = max(l, s);
         }
     }
 
-    if (events.empty()) {
-        cout << 0 << "\n";
-        return;
-    }
-
-    sort(all(events));
-
-    int cur = 0, before = 0, ans = 0;
-
-    for (int i = 0; i < sz(events);) {
-        int pos = events[i].X;
-        int sum = 0;
-
-        while (i < sz(events) && events[i].X == pos) {
-            sum += events[i].Y;
-            ++i;
-        }
-
-        cur += sum;
-
-        if (0 <= pos && pos <= OO) {
-            if (cur > before) {
-                before = cur;
-                ans = pos;
-            }
-        }
-    }
-
-    cout << ans << endl;
+    cout << sum + ans << "\n";
 }
+
+// thx Khlwsh
 
 bool solve_test(const int test_number) {
     int n = 1;

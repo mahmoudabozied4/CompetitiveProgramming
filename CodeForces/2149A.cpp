@@ -78,57 +78,13 @@ void preprocessing() {
 
 
 auto Solve(const int &n) -> void {
-    int a;
-    cin >> a;
-    vi v(n);
-    cin >> v;
-
-    vector<pii> events;
-
-    for (int i = 0; i < n; ++i) {
-        auto x = v[i], dist = x > a ? x - a : a - x;
-        if (dist == 0) continue;
-
-        auto l = x - dist + 1, r = x + dist - 1;
-
-        if (l < 0) l = 0;
-        if (r > OO) r = OO;
-
-        if (l > r) continue;
-        events.emplace_back(l, +1);
-        if (r < OO) {
-            events.emplace_back(r + 1, -1);
-        }
+    vi a(3); int x;
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        a[x + 1] += 1;
     }
-
-    if (events.empty()) {
-        cout << 0 << "\n";
-        return;
-    }
-
-    sort(all(events));
-
-    int cur = 0, before = 0, ans = 0;
-
-    for (int i = 0; i < sz(events);) {
-        int pos = events[i].X;
-        int sum = 0;
-
-        while (i < sz(events) && events[i].X == pos) {
-            sum += events[i].Y;
-            ++i;
-        }
-
-        cur += sum;
-
-        if (0 <= pos && pos <= OO) {
-            if (cur > before) {
-                before = cur;
-                ans = pos;
-            }
-        }
-    }
-
+    int ans = a[1];
+    if (a[0] &1) ans += 2;
     cout << ans << endl;
 }
 

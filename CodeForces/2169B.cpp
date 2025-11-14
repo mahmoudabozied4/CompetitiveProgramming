@@ -77,64 +77,75 @@ void preprocessing() {
 }
 
 
-auto Solve(const int &n) -> void {
-    int a;
-    cin >> a;
-    vi v(n);
-    cin >> v;
-
-    vector<pii> events;
-
-    for (int i = 0; i < n; ++i) {
-        auto x = v[i], dist = x > a ? x - a : a - x;
-        if (dist == 0) continue;
-
-        auto l = x - dist + 1, r = x + dist - 1;
-
-        if (l < 0) l = 0;
-        if (r > OO) r = OO;
-
-        if (l > r) continue;
-        events.emplace_back(l, +1);
-        if (r < OO) {
-            events.emplace_back(r + 1, -1);
-        }
-    }
-
-    if (events.empty()) {
-        cout << 0 << "\n";
-        return;
-    }
-
-    sort(all(events));
-
-    int cur = 0, before = 0, ans = 0;
-
-    for (int i = 0; i < sz(events);) {
-        int pos = events[i].X;
-        int sum = 0;
-
-        while (i < sz(events) && events[i].X == pos) {
-            sum += events[i].Y;
-            ++i;
-        }
-
-        cur += sum;
-
-        if (0 <= pos && pos <= OO) {
-            if (cur > before) {
-                before = cur;
-                ans = pos;
+auto Solve(const string &s) -> void {
+    int n = sz(s);
+    bool infinite = false;
+    if (n >= 2) {
+        for (int i = 0; i < n - 1; ++i) {
+            if (s[i] != '<' && s[i + 1] != '>') {
+                cout << -1 << '\n';
+                return;
             }
         }
     }
+    vector<int> dp(n, 0);
+    vector<int> vis(n, 0); // 0 = unvisited, 1 = in visited stack, 2 = visited
 
-    cout << ans << endl;
+    for (int i = 0; i < n; ++i) {
+        if (vis[i] != 0) continue;
+
+        vector<pii> st;
+        st.push_back({i, 0});
+
+        char cur ;
+        while (!st.empty()) {
+            auto [u, state] = st.back();
+            st.pop_back();
+
+            if (state == 0) {
+                if (vis[u] == 2) continue;
+                if (vis[u] == 1) {
+                    continue;
+                }
+                vis[u] = 1;
+                st.push_back({u, 1});
+                cur = s[u];
+                if (cur == '<' or cur == '*') {
+                    int v = u - 1;
+                    if (v >= 0 && vis[v] == 0) {
+                        st.push_back({v, 0});
+                    }
+                }
+                if (cur == '>' or  cur == '*') {
+                    int v = u + 1;
+                    if (v < n && vis[v] == 0) {
+                        st.push_back({v, 0});
+                    }
+                }
+            } else {
+                cur = s[u];
+                int ret = 0;
+
+                if (cur == '<' or cur == '*') {
+                    int v = u - 1;
+                    if (v >= 0) ret = max(ret, dp[v]);
+                }
+                if (cur == '>' or cur == '*') {
+                    int v = u + 1;
+                    if (v < n) ret = max(ret, dp[v]);
+                }
+                dp[u] = ret + 1;
+                vis[u] = 2;
+            }
+        }
+    }
+    cout << *max_element(all(dp)) << '\n';
 }
+// thx Khlwsh
 
 bool solve_test(const int test_number) {
-    int n = 1;
-    // string n;
+    // int n = 1;
+    string n;
     if (!(cin >> n))
         return false;
     Solve(n);

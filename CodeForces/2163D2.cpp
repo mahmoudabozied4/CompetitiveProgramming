@@ -37,10 +37,10 @@ template<class T>
 using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 void Zied() {
-    ios_base::sync_with_stdio(false), cin.tie(nullptr), cout.tie(nullptr);
-#ifndef ONLINE_JUDGE
-    freopen("input.txt", "r", stdin), freopen("output.txt", "w", stdout);
-#endif
+    // ios_base::sync_with_stdio(false), cin.tie(nullptr), cout.tie(nullptr);
+    // #ifndef ONLINE_JUDGE
+    //     freopen("input.txt", "r", stdin), freopen("output.txt", "w", stdout);
+    // #endif
 }
 
 template<typename T = int>
@@ -76,60 +76,50 @@ int dy[8] = {0, 1, 0, -1, -1, 1, 1, -1};
 void preprocessing() {
 }
 
+int ask(int l, int r){
+    cout << "? " << l << " " << r << endl;
+    int x; cin >> x;
+    return x;
+}
 
 auto Solve(const int &n) -> void {
-    int a;
-    cin >> a;
-    vi v(n);
-    cin >> v;
+    int q;
+    cin >> q;
+    vector<pii> a(q) ,na ;
+    vi l(n+1 , -1);
+    for (int i = 0; i < q; i++) {
+        cin >> a[i].X >> a[i].Y;
+        l[a[i].X] = max(l[a[i].X], a[i].Y);
+    }
 
-    vector<pii> events;
+    int mx = 0 ;
+    for(int i = 1; i <= n; i++){
+        if(l[i] == -1 || l[i] <= mx) continue;
 
-    for (int i = 0; i < n; ++i) {
-        auto x = v[i], dist = x > a ? x - a : a - x;
-        if (dist == 0) continue;
+        na.push_back({i, l[i]});
+        mx = max(mx, l[i]);
+    }
 
-        auto l = x - dist + 1, r = x + dist - 1;
+    int lo = 0;
+    int hi = sz(na) - 1;
+    int ans = 0;
+    while(lo <= hi){
+        int mid = lo + hi >> 1;
 
-        if (l < 0) l = 0;
-        if (r > OO) r = OO;
+        auto [l, r] = na[mid];
 
-        if (l > r) continue;
-        events.emplace_back(l, +1);
-        if (r < OO) {
-            events.emplace_back(r + 1, -1);
+        int c1 = ask(1, r);
+        int c2 = ask(l, n);
+
+        ans = max(ans, min(c1, c2));
+        if(c1 > c2){
+            hi = mid - 1;
+        }else{
+            lo = mid + 1;
         }
     }
 
-    if (events.empty()) {
-        cout << 0 << "\n";
-        return;
-    }
-
-    sort(all(events));
-
-    int cur = 0, before = 0, ans = 0;
-
-    for (int i = 0; i < sz(events);) {
-        int pos = events[i].X;
-        int sum = 0;
-
-        while (i < sz(events) && events[i].X == pos) {
-            sum += events[i].Y;
-            ++i;
-        }
-
-        cur += sum;
-
-        if (0 <= pos && pos <= OO) {
-            if (cur > before) {
-                before = cur;
-                ans = pos;
-            }
-        }
-    }
-
-    cout << ans << endl;
+    cout << "! " << ans << "\n";
 }
 
 bool solve_test(const int test_number) {

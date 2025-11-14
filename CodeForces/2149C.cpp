@@ -76,59 +76,49 @@ int dy[8] = {0, 1, 0, -1, -1, 1, 1, -1};
 void preprocessing() {
 }
 
+class Mex {
+public:
+    map<int, int> frequency;
+    set<int> missing_numbers;
+    vector<int> A;
+
+    Mex(vector<int> const& A) : A(A) {
+        for (int i = 0; i <= A.size(); i++)
+            missing_numbers.insert(i);
+
+        for (int x : A) {
+            ++frequency[x];
+            missing_numbers.erase(x);
+        }
+    }
+
+    int mex() {
+        return *missing_numbers.begin();
+    }
+
+    void update(int idx, int new_value) {
+        if (--frequency[A[idx]] == 0)
+            missing_numbers.insert(A[idx]);
+        A[idx] = new_value;
+        ++frequency[new_value];
+        missing_numbers.erase(new_value);
+    }
+};
 
 auto Solve(const int &n) -> void {
-    int a;
-    cin >> a;
-    vi v(n);
-    cin >> v;
-
-    vector<pii> events;
-
-    for (int i = 0; i < n; ++i) {
-        auto x = v[i], dist = x > a ? x - a : a - x;
-        if (dist == 0) continue;
-
-        auto l = x - dist + 1, r = x + dist - 1;
-
-        if (l < 0) l = 0;
-        if (r > OO) r = OO;
-
-        if (l > r) continue;
-        events.emplace_back(l, +1);
-        if (r < OO) {
-            events.emplace_back(r + 1, -1);
-        }
-    }
-
-    if (events.empty()) {
-        cout << 0 << "\n";
+    int k ; cin >> k;
+    vi a(n) ; cin >> a;
+    Mex mex(a);
+    int ans = 0 ;
+    // cout << mex.mex() << endl;
+    if (mex.mex() >= k) {
+        cout << mex.frequency[k] << '\n';
         return;
     }
-
-    sort(all(events));
-
-    int cur = 0, before = 0, ans = 0;
-
-    for (int i = 0; i < sz(events);) {
-        int pos = events[i].X;
-        int sum = 0;
-
-        while (i < sz(events) && events[i].X == pos) {
-            sum += events[i].Y;
-            ++i;
-        }
-
-        cur += sum;
-
-        if (0 <= pos && pos <= OO) {
-            if (cur > before) {
-                before = cur;
-                ans = pos;
-            }
-        }
+    for (int i = 0 ; i < k ; i ++ ) {
+        if (!mex.frequency[i]) ans ++ ;
     }
-
+    if (ans < mex.frequency[k]) ans += mex.frequency[k] - ans ;
     cout << ans << endl;
 }
 

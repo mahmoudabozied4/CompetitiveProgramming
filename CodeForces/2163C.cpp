@@ -28,7 +28,7 @@ const double EPS = 1e-9, pi = 3.141592653589793;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 #define pb push_back
-vector<string> RET = {"NO", "YES"};
+vector<string> RET = {"No", "Yes"};
 #define IO(NAME) \
 cin.tie(0)->sync_with_stdio(0); \
 if(fopen(NAME ".in","r")) freopen(NAME ".in","r",stdin), \
@@ -76,60 +76,52 @@ int dy[8] = {0, 1, 0, -1, -1, 1, 1, -1};
 void preprocessing() {
 }
 
+auto Solve(const int &n) -> int {
+    vector<int> a1(n), a2(n);
+    cin >> a1 >> a2;
 
-auto Solve(const int &n) -> void {
-    int a;
-    cin >> a;
-    vi v(n);
-    cin >> v;
+    vector<int> prefMn1(n), prefMx1(n);
+    prefMn1[0] = a1[0];
+    prefMx1[0] = a1[0];
+    for (int i = 1; i < n; ++i) {
+        prefMn1[i] = min(prefMn1[i - 1], a1[i]);
+        prefMx1[i] = max(prefMx1[i - 1], a1[i]);
+    }
 
-    vector<pii> events;
+    vector<int> suffMn2(n), suffMx2(n);
+    suffMn2[n - 1] = a2[n - 1];
+    suffMx2[n - 1] = a2[n - 1];
+    for (int i = n - 2; i >= 0; --i) {
+        suffMn2[i] = min(suffMn2[i + 1], a2[i]);
+        suffMx2[i] = max(suffMx2[i + 1], a2[i]);
+    }
 
+    int N = 2 * n;
+
+    vector<int> dp(N + 2, OO), vis(N + 2);
     for (int i = 0; i < n; ++i) {
-        auto x = v[i], dist = x > a ? x - a : a - x;
-        if (dist == 0) continue;
-
-        auto l = x - dist + 1, r = x + dist - 1;
-
-        if (l < 0) l = 0;
-        if (r > OO) r = OO;
-
-        if (l > r) continue;
-        events.emplace_back(l, +1);
-        if (r < OO) {
-            events.emplace_back(r + 1, -1);
-        }
+        int left = min(prefMn1[i], suffMn2[i]), right = max(prefMx1[i], suffMx2[i]);
+        left = max(1LL, min(left, N)), right = max(1LL, min(right, N));
+        dp[left] = min(dp[left], right);
     }
 
-    if (events.empty()) {
-        cout << 0 << "\n";
-        return;
+    function<int(int)> rec = [&](int l) -> int {
+        if (l > N) return OO;
+        if (vis[l]) return dp[l];
+        vis[l] = 1;
+        dp[l] = min(dp[l], rec(l + 1));
+        return dp[l];
+    };
+
+    auto _ = rec(1LL);
+
+    int ans = 0;
+    for (int i = 1; i <= N; ++i) {
+        if (dp[i] <= N)
+            ans += N - dp[i] + 1;
     }
 
-    sort(all(events));
-
-    int cur = 0, before = 0, ans = 0;
-
-    for (int i = 0; i < sz(events);) {
-        int pos = events[i].X;
-        int sum = 0;
-
-        while (i < sz(events) && events[i].X == pos) {
-            sum += events[i].Y;
-            ++i;
-        }
-
-        cur += sum;
-
-        if (0 <= pos && pos <= OO) {
-            if (cur > before) {
-                before = cur;
-                ans = pos;
-            }
-        }
-    }
-
-    cout << ans << endl;
+    return ans;
 }
 
 bool solve_test(const int test_number) {
@@ -137,9 +129,9 @@ bool solve_test(const int test_number) {
     // string n;
     if (!(cin >> n))
         return false;
-    Solve(n);
-    // auto ans = Solve(n);
-    // cout << ans << endl;
+    // Solve(n);
+    auto ans = Solve(n);
+    cout << ans << endl;
     return true;
 }
 
